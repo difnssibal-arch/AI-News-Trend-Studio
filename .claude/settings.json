@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Test-Path \"c:\\\\Users\\\\difns\\\\OneDrive\\\\바탕 화면\\\\완성프로그램\\\\AI-News-Trend-Studio\\\\.env\")",
+      "Read(//c/Users/difns/OneDrive/���� ȭ��/�ϼ����α׷�/AI-News-Trend-Studio/**)",
+      "PowerShell(npm info node-sqlite3-wasm dist-tags 2>&1)",
+      "PowerShell(cd \"c:\\\\Users\\\\difns\\\\OneDrive\\\\바탕 화면\\\\완성프로그램\\\\AI-News-Trend-Studio\" && Remove-Item backend\\\\database\\\\news.db -ErrorAction SilentlyContinue; Start-Process -FilePath \"node\" -ArgumentList \"backend/server.js\" -PassThru | Select-Object Id; Start-Sleep 3; try { $r = Invoke-RestMethod http://localhost:3000/api/stats; Write-Host \"Stats OK: $\\($r | ConvertTo-Json\\)\" } catch { Write-Host \"Error: $_\" }; Stop-Process -Name \"node\" -ErrorAction SilentlyContinue)",
+      "PowerShell(cd \"c:\\\\Users\\\\difns\\\\OneDrive\\\\바탕 화면\\\\완성프로그램\\\\AI-News-Trend-Studio\" && Remove-Item backend\\\\database\\\\news.db -ErrorAction SilentlyContinue; $proc = Start-Process -FilePath \"node\" -ArgumentList \"backend/server.js\" -PassThru -WorkingDirectory \\(Get-Location\\); Start-Sleep 3; try { $r = Invoke-RestMethod http://localhost:3001/api/stats; Write-Host \"OK: $\\($r | ConvertTo-Json -Depth 3\\)\" } catch { Write-Host \"Error: $_\" }; Stop-Process -Id $proc.Id -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Process node -ErrorAction SilentlyContinue)",
+      "PowerShell(Stop-Process -Force)",
+      "PowerShell(Get-Job)",
+      "PowerShell(Remove-Job -Force)",
+      "PowerShell(netstat -ano)",
+      "PowerShell(Get-ChildItem \"$env:LOCALAPPDATA\\\\AINewsTrendStudio\" -ErrorAction SilentlyContinue)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\difns\\OneDrive\\���� ȭ��\\�ϼ����α׷�\\AI-News-Trend-Studio\\backend"
+    ]
+  }
+}

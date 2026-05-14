@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI News Trend Studio</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f13;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border-bottom: 1px solid #2d3748;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header h1 { font-size: 1.4rem; font-weight: 700; color: #63b3ed; }
+    header span { font-size: 0.8rem; color: #718096; }
+
+    .stats-bar {
+      display: flex;
+      gap: 16px;
+      padding: 16px 24px;
+      background: #1a1a2e;
+      border-bottom: 1px solid #2d3748;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: #2d3748;
+      border-radius: 8px;
+      padding: 10px 18px;
+      text-align: center;
+      min-width: 120px;
+    }
+
+    .stat-card .value { font-size: 1.6rem; font-weight: 700; color: #63b3ed; }
+    .stat-card .label { font-size: 0.72rem; color: #a0aec0; margin-top: 2px; }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      padding: 14px 24px;
+      background: #161622;
+      border-bottom: 1px solid #2d3748;
+      flex-wrap: wrap;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: opacity 0.15s;
+    }
+
+    button:hover { opacity: 0.85; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-primary { background: #3182ce; color: #fff; }
+    .btn-success { background: #38a169; color: #fff; }
+    .btn-warning { background: #d69e2e; color: #fff; }
+    .btn-secondary { background: #4a5568; color: #e2e8f0; }
+
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      padding: 10px 24px;
+      background: #0f0f13;
+      border-bottom: 1px solid #1a1a2e;
+      align-items: center;
+    }
+
+    .filter-bar select, .filter-bar input {
+      background: #2d3748;
+      border: 1px solid #4a5568;
+      border-radius: 6px;
+      color: #e2e8f0;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+    }
+
+    .main { display: flex; height: calc(100vh - 200px); overflow: hidden; }
+
+    .article-list {
+      width: 380px;
+      min-width: 280px;
+      overflow-y: auto;
+      border-right: 1px solid #2d3748;
+      background: #121218;
+    }
+
+    .article-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid #1e2033;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+
+    .article-item:hover { background: #1a1a2e; }
+    .article-item.active { background: #1e2a3a; border-left: 3px solid #63b3ed; }
+
+    .article-item .source-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .badge-openai { background: #1a4731; color: #68d391; }
+    .badge-anthropic { background: #3b1d1d; color: #fc8181; }
+    .badge-google { background: #1a2e4a; color: #63b3ed; }
+
+    .article-item .title {
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: #e2e8f0;
+      margin-bottom: 4px;
+    }
+
+    .article-item .meta {
+      font-size: 0.7rem;
+      color: #718096;
+    }
+
+    .article-item .processed-dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #38a169;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .detail-pane {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      background: #0f0f13;
+    }
+
+    .detail-pane h2 { font-size: 1.1rem; color: #90cdf4; margin-bottom: 6px; }
+    .detail-pane .article-meta { font-size: 0.78rem; color: #718096; margin-bottom: 16px; }
+    .detail-pane a { color: #63b3ed; font-size: 0.82rem; }
+
+    .script-tabs {
+      display: flex;
+      gap: 8px;
+      margin: 16px 0 12px;
+    }
+
+    .tab-btn {
+      background: #2d3748;
+      color: #a0aec0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+    }
+
+    .tab-btn.active { background: #3182ce; color: #fff; }
+
+    .script-box {
+      background: #1a1a2e;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 16px;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: #cbd5e0;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .generate-row {
+      display: flex;
+      gap: 8px;
+      margin: 12px 0;
+      align-items: center;
+    }
+
+    .status-msg {
+      font-size: 0.78rem;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .status-ok { background: #1a4731; color: #68d391; }
+    .status-err { background: #3b1d1d; color: #fc8181; }
+    .status-info { background: #1a2e4a; color: #63b3ed; }
+
+    .empty-state {
+      text-align: center;
+      color: #4a5568;
+      padding: 60px 20px;
+      font-size: 0.9rem;
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #0f0f13; }
+    ::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>AI News Trend Studio</h1>
+  <span id="last-updated">로딩 중...</span>
+</header>
+
+<div class="stats-bar" id="stats-bar">
+  <div class="stat-card"><div class="value" id="s-total">—</div><div class="label">총 기사</div></div>
+  <div class="stat-card"><div class="value" id="s-processed">—</div><div class="label">처리 완료</div></div>
+  <div class="stat-card"><div class="value" id="s-scripts">—</div><div class="label">생성된 대본</div></div>
+  <div class="stat-card"><div class="value" id="s-openai">—</div><div class="label">OpenAI</div></div>
+  <div class="stat-card"><div class="value" id="s-anthropic">—</div><div class="label">Anthropic</div></div>
+  <div class="stat-card"><div class="value" id="s-google">—</div><div class="label">Google AI</div></div>
+</div>
+
+<div class="actions">
+  <button class="btn-primary" onclick="triggerScrape()">수집 시작</button>
+  <button class="btn-success" onclick="triggerGenerateAll()">미처리 대본 생성</button>
+  <button class="btn-secondary" onclick="loadArticles()">새로고침</button>
+</div>
+
+<div class="filter-bar">
+  <select id="filter-source" onchange="loadArticles()">
+    <option value="">전체 소스</option>
+    <option value="OpenAI Blog">OpenAI</option>
+    <option value="Anthropic Blog">Anthropic</option>
+    <option value="Google AI Blog">Google AI</option>
+  </select>
+  <select id="filter-processed" onchange="loadArticles()">
+    <option value="">전체</option>
+    <option value="0">미처리</option>
+    <option value="1">처리 완료</option>
+  </select>
+</div>
+
+<div class="main">
+  <div class="article-list" id="article-list"></div>
+  <div class="detail-pane" id="detail-pane">
+    <div class="empty-state">← 기사를 선택하세요</div>
+  </div>
+</div>
+
+<script>
+const API = '';
+let currentArticleId = null;
+let currentScriptType = 'shorts';
+
+async function fetchJSON(path, opts = {}) {
+  const r = await fetch(API + path, opts);
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+function sourceBadgeClass(src) {
+  if (src.includes('OpenAI')) return 'badge-openai';
+  if (src.includes('Anthropic')) return 'badge-anthropic';
+  return 'badge-google';
+}
+
+function shortSource(src) {
+  if (src.includes('OpenAI')) return 'OpenAI';
+  if (src.includes('Anthropic')) return 'Anthropic';
+  return 'Google AI';
+}
+
+async function loadStats() {
+  try {
+    const d = await fetchJSON('/api/stats');
+    document.getElementById('s-total').textContent = d.totalArticles;
+    document.getElementById('s-processed').textContent = d.processedArticles;
+    document.getElementById('s-scripts').textContent = d.totalScripts;
+    (d.bySource || []).forEach(s => {
+      if (s.source.includes('OpenAI')) document.getElementById('s-openai').textContent = s.n;
+      if (s.source.includes('Anthropic')) document.getElementById('s-anthropic').textContent = s.n;
+      if (s.source.includes('Google')) document.getElementById('s-google').textContent = s.n;
+    });
+    document.getElementById('last-updated').textContent = '업데이트: ' + new Date().toLocaleTimeString('ko-KR');
+  } catch {}
+}
+
+async function loadArticles() {
+  const source = document.getElementById('filter-source').value;
+  const processed = document.getElementById('filter-processed').value;
+  let url = '/api/articles?limit=50';
+  if (source) url += `&source=${encodeURIComponent(source)}`;
+  if (processed !== '') url += `&processed=${processed}`;
+
+  const data = await fetchJSON(url);
+  const list = document.getElementById('article-list');
+
+  if (!data.articles.length) {
+    list.innerHTML = '<div class="empty-state">기사가 없습니다.<br>수집 시작을 눌러주세요.</div>';
+    return;
+  }
+
+  list.innerHTML = data.articles.map(a => `
+    <div class="article-item ${a.id === currentArticleId ? 'active' : ''}" onclick="selectArticle(${a.id})">
+      <span class="source-badge ${sourceBadgeClass(a.source)}">${shortSource(a.source)}</span>
+      ${a.is_processed ? '<span class="processed-dot" title="대본 생성 완료"></span>' : ''}
+      <div class="title">${escHtml(a.title)}</div>
+      <div class="meta">${a.created_at ? a.created_at.slice(0, 16) : ''}</div>
+    </div>
+  `).join('');
+}
+
+async function selectArticle(id) {
+  currentArticleId = id;
+  currentScriptType = 'shorts';
+  document.querySelectorAll('.article-item').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.article-item[onclick="selectArticle(${id})"]`)?.classList.add('active');
+
+  const data = await fetchJSON(`/api/articles/${id}`);
+  renderDetail(data);
+}
+
+function renderDetail(data) {
+  const shorts = data.scripts?.find(s => s.type === 'shorts');
+  const longform = data.scripts?.find(s => s.type === 'longform');
+  const current = currentScriptType === 'shorts' ? shorts : longform;
+
+  document.getElementById('detail-pane').innerHTML = `
+    <h2>${escHtml(data.title)}</h2>
+    <div class="article-meta">
+      ${data.source} &nbsp;·&nbsp;
+      <a href="${data.url}" target="_blank">원문 링크 →</a>
+    </div>
+
+    <div class="generate-row">
+      <button class="btn-primary" onclick="generateScript(${data.id}, 'shorts')">쇼츠 대본 생성</button>
+      <button class="btn-warning" onclick="generateScript(${data.id}, 'longform')">롱폼 대본 생성</button>
+    </div>
+
+    <div id="status-area"></div>
+
+    <div class="script-tabs">
+      <button class="tab-btn ${currentScriptType === 'shorts' ? 'active' : ''}" onclick="switchTab('shorts', ${data.id})">쇼츠 (60초)</button>
+      <button class="tab-btn ${currentScriptType === 'longform' ? 'active' : ''}" onclick="switchTab('longform', ${data.id})">롱폼 (8~10분)</button>
+    </div>
+
+    <div class="script-box" id="script-content">
+      ${current ? escHtml(current.content) : '<span style="color:#4a5568">아직 대본이 없습니다. 위 버튼으로 생성하세요.</span>'}
+    </div>
+  `;
+}
+
+async function switchTab(type, id) {
+  currentScriptType = type;
+  const data = await fetchJSON(`/api/articles/${id}`);
+  renderDetail(data);
+}
+
+async function generateScript(articleId, type) {
+  const statusArea = document.getElementById('status-area');
+  if (statusArea) statusArea.innerHTML = `<div class="status-msg status-info">생성 중... (수 초 소요)</div>`;
+
+  try {
+    await fetchJSON('/api/scripts/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ article_id: articleId, type }),
+    });
+    currentScriptType = type;
+    const data = await fetchJSON(`/api/articles/${articleId}`);
+    renderDetail(data);
+    loadStats();
+    if (document.getElementById('status-area'))
+      document.getElementById('status-area').innerHTML = `<div class="status-msg status-ok">대본 생성 완료!</div>`;
+  } catch (err) {
+    if (document.getElementById('status-area'))
+      document.getElementById('status-area').innerHTML = `<div class="status-msg status-err">오류: ${escHtml(err.message)}</div>`;
+  }
+}
+
+async function triggerScrape() {
+  await fetchJSON('/api/scrape', { method: 'POST' });
+  alert('수집을 시작했습니다. 잠시 후 새로고침 버튼을 눌러주세요.');
+  setTimeout(() => { loadArticles(); loadStats(); }, 8000);
+}
+
+async function triggerGenerateAll() {
+  await fetchJSON('/api/scripts/generate-all', { method: 'POST' });
+  alert('미처리 기사에 대한 대본 생성을 시작했습니다.');
+  setTimeout(() => { loadArticles(); loadStats(); }, 15000);
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Init
+loadStats();
+loadArticles();
+setInterval(() => { loadStats(); }, 60000);
+</script>
+</body>
+</html>

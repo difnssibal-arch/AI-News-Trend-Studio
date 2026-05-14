@@ -1,0 +1,27 @@
+{
+  "name": "ai-news-trend-studio",
+  "version": "1.0.0",
+  "description": "AI 트렌드 자동 수집 및 대본 생성 시스템",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "scrape": "node backend/scrapers/scraper.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "axios": "^1.7.9",
+    "node-sqlite3-wasm": "^0.8.57",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
