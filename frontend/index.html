@@ -7,209 +7,167 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0f0f13;
-      color: #e2e8f0;
-      min-height: 100vh;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f0f13; color: #e2e8f0; min-height: 100vh; }
 
     header {
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
       border-bottom: 1px solid #2d3748;
       padding: 18px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
     }
-
     header h1 { font-size: 1.4rem; font-weight: 700; color: #63b3ed; }
     header span { font-size: 0.8rem; color: #718096; }
 
     .stats-bar {
-      display: flex;
-      gap: 16px;
-      padding: 16px 24px;
-      background: #1a1a2e;
-      border-bottom: 1px solid #2d3748;
-      flex-wrap: wrap;
+      display: flex; gap: 16px; padding: 16px 24px;
+      background: #1a1a2e; border-bottom: 1px solid #2d3748; flex-wrap: wrap;
     }
-
-    .stat-card {
-      background: #2d3748;
-      border-radius: 8px;
-      padding: 10px 18px;
-      text-align: center;
-      min-width: 120px;
-    }
-
+    .stat-card { background: #2d3748; border-radius: 8px; padding: 10px 18px; text-align: center; min-width: 120px; }
+    .stat-card.clickable { cursor: pointer; transition: background 0.15s, transform 0.1s; }
+    .stat-card.clickable:hover { background: #3a4a5e; transform: translateY(-1px); }
     .stat-card .value { font-size: 1.6rem; font-weight: 700; color: #63b3ed; }
     .stat-card .label { font-size: 0.72rem; color: #a0aec0; margin-top: 2px; }
+    .stat-card.clickable .label::after { content: ' ↗'; font-size: 0.62rem; color: #63b3ed; }
+    .stat-card .sub-label { font-size: 0.62rem; color: #718096; margin-top: 3px; }
 
     .actions {
-      display: flex;
-      gap: 10px;
-      padding: 14px 24px;
-      background: #161622;
-      border-bottom: 1px solid #2d3748;
-      flex-wrap: wrap;
+      display: flex; gap: 10px; padding: 14px 24px;
+      background: #161622; border-bottom: 1px solid #2d3748; flex-wrap: wrap;
     }
-
-    button {
-      cursor: pointer;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 16px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      transition: opacity 0.15s;
-    }
-
+    button { cursor: pointer; border: none; border-radius: 6px; padding: 8px 16px; font-size: 0.85rem; font-weight: 600; transition: opacity 0.15s; }
     button:hover { opacity: 0.85; }
-    button:disabled { opacity: 0.4; cursor: not-allowed; }
-
+    button:disabled { opacity: 0.35; cursor: not-allowed; }
     .btn-primary { background: #3182ce; color: #fff; }
     .btn-success { background: #38a169; color: #fff; }
     .btn-warning { background: #d69e2e; color: #fff; }
     .btn-secondary { background: #4a5568; color: #e2e8f0; }
+    .btn-download { background: #2c5282; color: #bee3f8; border: 1px solid #3182ce; }
+    .btn-sm { padding: 5px 11px; font-size: 0.77rem; }
 
     .filter-bar {
-      display: flex;
-      gap: 8px;
-      padding: 10px 24px;
-      background: #0f0f13;
-      border-bottom: 1px solid #1a1a2e;
-      align-items: center;
+      display: flex; gap: 8px; padding: 10px 24px;
+      background: #0f0f13; border-bottom: 1px solid #1a1a2e; align-items: center;
+    }
+    .filter-bar select {
+      background: #2d3748; border: 1px solid #4a5568; border-radius: 6px;
+      color: #e2e8f0; padding: 6px 10px; font-size: 0.82rem;
     }
 
-    .filter-bar select, .filter-bar input {
-      background: #2d3748;
-      border: 1px solid #4a5568;
-      border-radius: 6px;
-      color: #e2e8f0;
-      padding: 6px 10px;
-      font-size: 0.82rem;
-    }
+    .main { display: flex; height: calc(100vh - 202px); overflow: hidden; }
 
-    .main { display: flex; height: calc(100vh - 200px); overflow: hidden; }
-
-    .article-list {
-      width: 380px;
-      min-width: 280px;
-      overflow-y: auto;
-      border-right: 1px solid #2d3748;
-      background: #121218;
-    }
-
-    .article-item {
-      padding: 14px 16px;
-      border-bottom: 1px solid #1e2033;
-      cursor: pointer;
-      transition: background 0.12s;
-    }
-
+    .article-list { width: 380px; min-width: 280px; overflow-y: auto; border-right: 1px solid #2d3748; background: #121218; }
+    .article-item { padding: 14px 16px; border-bottom: 1px solid #1e2033; cursor: pointer; transition: background 0.12s; }
     .article-item:hover { background: #1a1a2e; }
     .article-item.active { background: #1e2a3a; border-left: 3px solid #63b3ed; }
-
-    .article-item .source-badge {
-      display: inline-block;
-      font-size: 0.65rem;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 4px;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-    }
-
+    .article-item .source-badge { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-bottom: 6px; text-transform: uppercase; }
     .badge-openai { background: #1a4731; color: #68d391; }
     .badge-anthropic { background: #3b1d1d; color: #fc8181; }
     .badge-google { background: #1a2e4a; color: #63b3ed; }
+    .article-item .title { font-size: 0.85rem; line-height: 1.4; color: #e2e8f0; margin-bottom: 4px; }
+    .article-item .meta { font-size: 0.7rem; color: #718096; }
+    .article-item .processed-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #38a169; margin-left: 6px; vertical-align: middle; }
 
-    .article-item .title {
-      font-size: 0.85rem;
-      line-height: 1.4;
-      color: #e2e8f0;
-      margin-bottom: 4px;
-    }
-
-    .article-item .meta {
-      font-size: 0.7rem;
-      color: #718096;
-    }
-
-    .article-item .processed-dot {
-      display: inline-block;
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: #38a169;
-      margin-left: 6px;
-      vertical-align: middle;
-    }
-
-    .detail-pane {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px;
-      background: #0f0f13;
-    }
-
+    .detail-pane { flex: 1; overflow-y: auto; padding: 24px; background: #0f0f13; }
     .detail-pane h2 { font-size: 1.1rem; color: #90cdf4; margin-bottom: 6px; }
     .detail-pane .article-meta { font-size: 0.78rem; color: #718096; margin-bottom: 16px; }
     .detail-pane a { color: #63b3ed; font-size: 0.82rem; }
 
-    .script-tabs {
-      display: flex;
-      gap: 8px;
-      margin: 16px 0 12px;
-    }
-
-    .tab-btn {
-      background: #2d3748;
-      color: #a0aec0;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-    }
-
+    .script-tabs { display: flex; gap: 8px; margin: 16px 0 8px; align-items: center; flex-wrap: wrap; }
+    .tab-btn { background: #2d3748; color: #a0aec0; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; }
     .tab-btn.active { background: #3182ce; color: #fff; }
+    .tab-cnt { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 0 6px; font-size: 0.7rem; font-weight: 700; min-width: 18px; text-align: center; }
+    .tab-btn.active .tab-cnt { background: rgba(255,255,255,0.3); }
 
-    .script-box {
-      background: #1a1a2e;
-      border: 1px solid #2d3748;
-      border-radius: 8px;
-      padding: 16px;
-      white-space: pre-wrap;
-      font-size: 0.85rem;
-      line-height: 1.7;
-      color: #cbd5e0;
-      max-height: 420px;
-      overflow-y: auto;
-    }
+    .version-bar { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
+    .version-bar-label { font-size: 0.72rem; color: #718096; margin-right: 2px; }
+    .ver-btn { background: #2d3748; color: #a0aec0; padding: 4px 10px; border-radius: 4px; font-size: 0.72rem; border: 1px solid #4a5568; line-height: 1.4; }
+    .ver-btn:hover { background: #3a4a5e; color: #e2e8f0; }
+    .ver-btn.active { background: #2c5282; color: #bee3f8; border-color: #3182ce; }
 
-    .generate-row {
-      display: flex;
-      gap: 8px;
-      margin: 12px 0;
-      align-items: center;
-    }
+    .script-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
+    .script-header-left { font-size: 0.74rem; color: #718096; }
 
-    .status-msg {
-      font-size: 0.78rem;
-      padding: 8px 12px;
-      border-radius: 6px;
-      margin-bottom: 10px;
-    }
+    .script-box { background: #1a1a2e; border: 1px solid #2d3748; border-radius: 8px; padding: 16px; white-space: pre-wrap; font-size: 0.85rem; line-height: 1.7; color: #cbd5e0; max-height: 380px; overflow-y: auto; }
 
+    .generate-row { display: flex; gap: 8px; margin: 12px 0; align-items: center; }
+
+    .status-msg { font-size: 0.78rem; padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; }
     .status-ok { background: #1a4731; color: #68d391; }
     .status-err { background: #3b1d1d; color: #fc8181; }
     .status-info { background: #1a2e4a; color: #63b3ed; }
 
-    .empty-state {
-      text-align: center;
-      color: #4a5568;
-      padding: 60px 20px;
-      font-size: 0.9rem;
-    }
+    /* ── Extra actions ── */
+    .extra-section { margin-top: 18px; border-top: 1px solid #2d3748; padding-top: 14px; }
+    .extra-section-title { font-size: 0.72rem; color: #718096; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+    .extra-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+
+    .confirmed-title-bar { background: #1a2e4a; border: 1px solid #2d5a8a; border-radius: 6px; padding: 8px 12px; font-size: 0.82rem; color: #90cdf4; margin-bottom: 10px; }
+    .confirmed-title-bar em { color: #4a5568; font-style: normal; }
+
+    .title-candidates-wrap { margin-bottom: 8px; }
+    .extra-sub-label { font-size: 0.72rem; color: #718096; margin-bottom: 6px; font-weight: 600; }
+    .title-item { background: #1a1a2e; border: 1px solid #2d3748; border-radius: 6px; padding: 8px 12px; margin-bottom: 4px; cursor: pointer; font-size: 0.83rem; color: #cbd5e0; transition: background 0.12s, border-color 0.12s; }
+    .title-item:hover { background: #1e2a3a; border-color: #3182ce; }
+    .title-item.selected { background: #1a3a5c; border-color: #63b3ed; color: #bee3f8; }
+
+    .extra-content-area { margin-bottom: 12px; }
+    .extra-content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .extra-content-box { background: #1a1a2e; border: 1px solid #2d3748; border-radius: 8px; padding: 12px 14px; white-space: pre-wrap; font-size: 0.8rem; line-height: 1.65; color: #cbd5e0; max-height: 260px; overflow-y: auto; }
+
+    /* ── Publish section ── */
+    .publish-section { margin-top: 18px; background: #161622; border: 1px solid #2d3748; border-radius: 8px; padding: 14px 16px; }
+    .publish-section-title { font-size: 0.72rem; color: #718096; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+    .preset-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .preset-row label { font-size: 0.8rem; color: #a0aec0; }
+    .preset-select { background: #2d3748; border: 1px solid #4a5568; border-radius: 6px; color: #e2e8f0; padding: 5px 10px; font-size: 0.82rem; }
+    .status-pill { font-size: 0.7rem; font-weight: 700; padding: 2px 9px; border-radius: 10px; }
+    .status-draft { background: #3b3b1d; color: #ecc94b; }
+    .status-ready { background: #1a4731; color: #68d391; }
+
+    .commentary-label { font-size: 0.8rem; color: #a0aec0; margin-bottom: 6px; }
+    .commentary-note { font-size: 0.7rem; color: #718096; }
+    .commentary-textarea { width: 100%; background: #1a1a2e; border: 1px solid #4a5568; border-radius: 6px; color: #e2e8f0; padding: 8px 12px; font-size: 0.83rem; font-family: 'Segoe UI', sans-serif; resize: vertical; min-height: 64px; }
+    .commentary-textarea:focus { outline: none; border-color: #3182ce; }
+
+    .btn-publish { background: #2f855a; color: #fff; font-size: 0.85rem; padding: 7px 18px; }
+    .btn-publish:not(:disabled):hover { background: #276749; }
+
+    /* ── Render section ── */
+    .render-section { margin-top: 18px; background: #0e0e1a; border: 1px solid #2d3748; border-radius: 8px; padding: 14px 16px; }
+    .render-section-title { font-size: 0.72rem; color: #718096; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+    .voice-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .voice-row label { font-size: 0.8rem; color: #a0aec0; }
+    .voice-select { background: #2d3748; border: 1px solid #4a5568; border-radius: 6px; color: #e2e8f0; padding: 5px 10px; font-size: 0.82rem; }
+    .render-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .btn-narration { background: #2c5f8a; color: #fff; font-size: 0.85rem; padding: 7px 18px; }
+    .btn-narration:not(:disabled):hover { background: #1a4a70; }
+    .btn-render { background: #553c9a; color: #fff; font-size: 0.85rem; padding: 7px 18px; }
+    .btn-render:not(:disabled):hover { background: #44337a; }
+    .render-progress-wrap { margin-bottom: 10px; }
+    .render-progress-bar { width: 100%; height: 6px; background: #2d3748; border-radius: 3px; overflow: hidden; margin-bottom: 5px; }
+    .render-progress-fill { height: 100%; background: linear-gradient(90deg, #3182ce, #63b3ed); border-radius: 3px; transition: width 0.4s ease; }
+    .render-status-msg { font-size: 0.75rem; color: #90cdf4; }
+    .video-preview-wrap { margin-top: 12px; }
+    .video-preview { width: 100%; max-height: 280px; border-radius: 8px; background: #000; display: block; }
+
+    .empty-state { text-align: center; color: #4a5568; padding: 60px 20px; font-size: 0.9rem; }
+    .loading-text { color: #718096; font-size: 0.8rem; padding: 8px 0; }
+
+    /* ── Modal ── */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; align-items: center; justify-content: center; }
+    .modal-box { background: #1a1a2e; border: 1px solid #2d3748; border-radius: 12px; width: min(800px, 95vw); max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #2d3748; flex-shrink: 0; }
+    .modal-header h3 { font-size: 1rem; color: #90cdf4; }
+    .modal-close { background: #2d3748; color: #a0aec0; border-radius: 6px; padding: 4px 10px; font-size: 0.8rem; }
+    .modal-body { overflow-y: auto; padding: 12px 20px; flex: 1; }
+    .modal-script-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #2d3748; }
+    .modal-script-row:last-child { border-bottom: none; }
+    .modal-script-info { flex: 1; min-width: 0; }
+    .modal-script-title { font-size: 0.83rem; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+    .modal-script-meta { font-size: 0.7rem; color: #718096; display: flex; align-items: center; gap: 6px; }
+    .type-tag { font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: 3px; }
+    .type-tag-shorts { background: #1a4731; color: #68d391; }
+    .type-tag-longform { background: #3b2a1a; color: #f6ad55; }
 
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: #0f0f13; }
@@ -223,13 +181,20 @@
   <span id="last-updated">로딩 중...</span>
 </header>
 
-<div class="stats-bar" id="stats-bar">
+<div class="stats-bar">
   <div class="stat-card"><div class="value" id="s-total">—</div><div class="label">총 기사</div></div>
   <div class="stat-card"><div class="value" id="s-processed">—</div><div class="label">처리 완료</div></div>
-  <div class="stat-card"><div class="value" id="s-scripts">—</div><div class="label">생성된 대본</div></div>
+  <div class="stat-card clickable" onclick="openScriptsModal()" title="클릭하면 전체 대본 목록 보기">
+    <div class="value" id="s-scripts">—</div><div class="label">생성된 대본</div>
+  </div>
   <div class="stat-card"><div class="value" id="s-openai">—</div><div class="label">OpenAI</div></div>
   <div class="stat-card"><div class="value" id="s-anthropic">—</div><div class="label">Anthropic</div></div>
   <div class="stat-card"><div class="value" id="s-google">—</div><div class="label">Google AI</div></div>
+  <div class="stat-card" title="Claude API 누적 토큰 사용량">
+    <div class="value" id="s-tokens">—</div>
+    <div class="label">Claude 토큰</div>
+    <div class="sub-label" id="s-tokens-detail">입력/출력</div>
+  </div>
 </div>
 
 <div class="actions">
@@ -254,131 +219,307 @@
 
 <div class="main">
   <div class="article-list" id="article-list"></div>
-  <div class="detail-pane" id="detail-pane">
-    <div class="empty-state">← 기사를 선택하세요</div>
+  <div class="detail-pane" id="detail-pane"><div class="empty-state">← 기사를 선택하세요</div></div>
+</div>
+
+<!-- 전체 대본 모달 -->
+<div class="modal-overlay" id="scripts-modal" onclick="onModalOverlayClick(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>전체 생성 대본 목록</h3>
+      <button class="modal-close" onclick="closeModal()">닫기 ✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"><div class="empty-state">로딩 중...</div></div>
   </div>
 </div>
 
 <script>
-const API = '';
-let currentArticleId = null;
-let currentScriptType = 'shorts';
+// ── State ──────────────────────────────────────────────────────────────────
+let currentArticleId   = null;
+let currentScriptType  = 'shorts';
+let currentArticleData = null;
+let currentVersionIdx  = 0;
+let modalScriptsData   = [];
 
+// Extras cache (cleared when navigating to a different script)
+let extrasScriptId      = null;
+let cachedTitles        = [];
+let cachedBlogContent   = '';
+let cachedCardNews      = '';
+
+// Render state
+let voicesList     = [];
+let renderPollTimer = null;
+
+// ── Utility ────────────────────────────────────────────────────────────────
 async function fetchJSON(path, opts = {}) {
-  const r = await fetch(API + path, opts);
+  const r = await fetch(path, opts);
   if (!r.ok) throw new Error(await r.text());
   return r.json();
 }
 
+function escHtml(str) {
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmtTokens(n) {
+  if (!n) return '0';
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000)    return (n / 1000).toFixed(1) + 'K';
+  return String(n);
+}
+
 function sourceBadgeClass(src) {
-  if (src.includes('OpenAI')) return 'badge-openai';
-  if (src.includes('Anthropic')) return 'badge-anthropic';
+  if (src.includes('OpenAI'))     return 'badge-openai';
+  if (src.includes('Anthropic'))  return 'badge-anthropic';
   return 'badge-google';
 }
 
 function shortSource(src) {
-  if (src.includes('OpenAI')) return 'OpenAI';
+  if (src.includes('OpenAI'))    return 'OpenAI';
   if (src.includes('Anthropic')) return 'Anthropic';
   return 'Google AI';
 }
 
+function triggerDownload(content, basename) {
+  const safe = String(basename).replace(/[\\/:*?"<>|]/g, '_').slice(0, 80);
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), { href: url, download: safe + '.txt' });
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── Stats ──────────────────────────────────────────────────────────────────
 async function loadStats() {
   try {
     const d = await fetchJSON('/api/stats');
-    document.getElementById('s-total').textContent = d.totalArticles;
+    document.getElementById('s-total').textContent     = d.totalArticles;
     document.getElementById('s-processed').textContent = d.processedArticles;
-    document.getElementById('s-scripts').textContent = d.totalScripts;
+    document.getElementById('s-scripts').textContent   = d.totalScripts;
     (d.bySource || []).forEach(s => {
-      if (s.source.includes('OpenAI')) document.getElementById('s-openai').textContent = s.n;
+      if (s.source.includes('OpenAI'))    document.getElementById('s-openai').textContent    = s.n;
       if (s.source.includes('Anthropic')) document.getElementById('s-anthropic').textContent = s.n;
-      if (s.source.includes('Google')) document.getElementById('s-google').textContent = s.n;
+      if (s.source.includes('Google'))    document.getElementById('s-google').textContent    = s.n;
     });
-    document.getElementById('last-updated').textContent = '업데이트: ' + new Date().toLocaleTimeString('ko-KR');
+    if (d.usage) {
+      const total = (d.usage.input_tokens || 0) + (d.usage.output_tokens || 0);
+      document.getElementById('s-tokens').textContent       = fmtTokens(total);
+      document.getElementById('s-tokens-detail').textContent =
+        `입력 ${fmtTokens(d.usage.input_tokens)} / 출력 ${fmtTokens(d.usage.output_tokens)}`;
+    }
+    document.getElementById('last-updated').textContent =
+      '업데이트: ' + new Date().toLocaleTimeString('ko-KR');
   } catch {}
 }
 
+// ── Articles ───────────────────────────────────────────────────────────────
 async function loadArticles() {
-  const source = document.getElementById('filter-source').value;
+  const source    = document.getElementById('filter-source').value;
   const processed = document.getElementById('filter-processed').value;
   let url = '/api/articles?limit=50';
-  if (source) url += `&source=${encodeURIComponent(source)}`;
+  if (source)          url += `&source=${encodeURIComponent(source)}`;
   if (processed !== '') url += `&processed=${processed}`;
 
   const data = await fetchJSON(url);
   const list = document.getElementById('article-list');
-
   if (!data.articles.length) {
     list.innerHTML = '<div class="empty-state">기사가 없습니다.<br>수집 시작을 눌러주세요.</div>';
     return;
   }
-
   list.innerHTML = data.articles.map(a => `
     <div class="article-item ${a.id === currentArticleId ? 'active' : ''}" onclick="selectArticle(${a.id})">
       <span class="source-badge ${sourceBadgeClass(a.source)}">${shortSource(a.source)}</span>
       ${a.is_processed ? '<span class="processed-dot" title="대본 생성 완료"></span>' : ''}
       <div class="title">${escHtml(a.title)}</div>
       <div class="meta">${a.created_at ? a.created_at.slice(0, 16) : ''}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 async function selectArticle(id) {
-  currentArticleId = id;
+  currentArticleId  = id;
   currentScriptType = 'shorts';
+  currentVersionIdx = 0;
+  clearExtrasCache();
+  _stopRenderPoll();
   document.querySelectorAll('.article-item').forEach(el => el.classList.remove('active'));
   document.querySelector(`.article-item[onclick="selectArticle(${id})"]`)?.classList.add('active');
-
   const data = await fetchJSON(`/api/articles/${id}`);
   renderDetail(data);
 }
 
+// ── Render ─────────────────────────────────────────────────────────────────
 function renderDetail(data) {
-  const shorts = data.scripts?.find(s => s.type === 'shorts');
-  const longform = data.scripts?.find(s => s.type === 'longform');
-  const current = currentScriptType === 'shorts' ? shorts : longform;
+  currentArticleData = data;
+  const shortsAll  = (data.scripts || []).filter(s => s.type === 'shorts').sort((a,b) => b.id - a.id);
+  const longformAll= (data.scripts || []).filter(s => s.type === 'longform').sort((a,b) => b.id - a.id);
+  const currentScripts = currentScriptType === 'shorts' ? shortsAll : longformAll;
+  if (currentVersionIdx >= currentScripts.length) currentVersionIdx = 0;
+  const sel = currentScripts[currentVersionIdx] || null;
+
+  // Check if we're on a different script → clear extras cache
+  const newScriptId = sel?.id ?? null;
+  if (newScriptId !== extrasScriptId) clearExtrasCache(newScriptId);
+
+  // Version bar
+  let versionBarHtml = '';
+  if (currentScripts.length > 1) {
+    const btns = currentScripts.map((s, i) => {
+      const num   = currentScripts.length - i;
+      const label = i === 0 ? `${num}회 (최신)` : `${num}회`;
+      const time  = s.created_at ? s.created_at.slice(5, 16) : '';
+      return `<button class="ver-btn ${i === currentVersionIdx ? 'active' : ''}"
+                onclick="selectVersion(${i}, ${data.id})">${escHtml(label)}<br><span style="font-size:0.64rem;opacity:0.65">${time}</span></button>`;
+    }).join('');
+    versionBarHtml = `<div class="version-bar"><span class="version-bar-label">버전:</span>${btns}</div>`;
+  }
+
+  // Script header
+  const scriptHeaderHtml = sel ? `
+    <div class="script-header">
+      <span class="script-header-left">
+        ${sel.created_at ? '생성: ' + sel.created_at.slice(0, 16) : ''}
+        ${currentScripts.length > 1 ? ` &nbsp;·&nbsp; ${currentScripts.length - currentVersionIdx}/${currentScripts.length}` : ''}
+      </span>
+      <button class="btn-download btn-sm" onclick="downloadCurrentScript()">⬇ 대본 다운로드 (.txt)</button>
+    </div>` : '';
+
+  // Extra actions section (only when script exists)
+  const extrasHtml = sel ? `
+    <div class="extra-section">
+      <div class="extra-section-title">추가 작업</div>
+      <div class="extra-btns">
+        <button class="btn-secondary btn-sm" onclick="genTitles(${sel.id})">🏷 제목 후보 10개</button>
+        <button class="btn-secondary btn-sm" onclick="genBlog(${sel.id})">📝 블로그 글 생성</button>
+        <button class="btn-secondary btn-sm" onclick="genCardNews(${sel.id})">🃏 카드뉴스 생성</button>
+      </div>
+      <div id="confirmed-title-bar" class="confirmed-title-bar" style="${sel.title ? '' : 'display:none'}">
+        ✅ 확정 제목: <strong id="confirmed-title-text">${escHtml(sel.title || '')}</strong>
+      </div>
+      <div id="titles-area"></div>
+      <div id="blog-area"></div>
+      <div id="cardnews-area"></div>
+    </div>
+    <div class="publish-section">
+      <div class="publish-section-title">발행 설정</div>
+      <div class="preset-row">
+        <label>편집 프리셋</label>
+        <select id="preset-select" class="preset-select" onchange="onPresetChange(${sel.id})">
+          <option value="A" ${(sel.editingPreset || 'A') === 'A' ? 'selected' : ''}>A형</option>
+          <option value="B" ${(sel.editingPreset || 'A') === 'B' ? 'selected' : ''}>B형</option>
+          <option value="C" ${(sel.editingPreset || 'A') === 'C' ? 'selected' : ''}>C형</option>
+        </select>
+        <span id="script-status-pill" class="status-pill ${(sel.status||'draft') === 'ready' ? 'status-ready' : 'status-draft'}">
+          ${(sel.status||'draft') === 'ready' ? '✅ 발행 준비 완료' : '📝 초안'}
+        </span>
+      </div>
+      <div class="commentary-label">
+        내 코멘트 <span class="commentary-note">(입력하면 발행 가능 버튼 활성화)</span>
+      </div>
+      <textarea id="commentary-input" class="commentary-textarea" rows="3"
+                placeholder="이 대본에 대한 방향, 메모, 촬영 계획 등을 입력하세요..."
+                oninput="updatePublishBtn()">${escHtml(sel.myCommentary || '')}</textarea>
+      <div style="margin-top:10px;">
+        <button class="btn-publish" id="publish-btn"
+                onclick="publishScript(${sel.id})"
+                ${(sel.myCommentary || '').trim() ? '' : 'disabled'}>
+          ✅ 발행 가능으로 표시
+        </button>
+      </div>
+    </div>
+    <div class="render-section" id="render-section">
+      <div class="render-section-title">영상 제작</div>
+      <div class="voice-row">
+        <label>목소리</label>
+        <select class="voice-select" id="voice-select"></select>
+      </div>
+      <div class="render-btns">
+        <button class="btn-narration" id="narration-btn" onclick="genNarration(${sel.id})">🎙 나레이션 생성</button>
+        <button class="btn-render" id="render-btn" onclick="startRender(${sel.id})" ${sel.narrationPath ? '' : 'disabled'}>🎬 영상 렌더링</button>
+      </div>
+      <div class="render-progress-wrap" id="render-progress-wrap" style="${['rendering','error'].includes(sel.renderStatus||'') ? '' : 'display:none'}">
+        <div class="render-progress-bar"><div class="render-progress-fill" id="render-progress-fill" style="width:${sel.renderProgress||0}%"></div></div>
+        <div class="render-status-msg" id="render-status-msg">${sel.renderStatus === 'rendering' ? `${sel.renderProgress||0}% — 렌더링 중...` : sel.renderStatus === 'error' ? '오류가 발생했습니다.' : ''}</div>
+      </div>
+      <div class="video-preview-wrap" id="video-preview-wrap" style="${sel.renderStatus === 'done' ? '' : 'display:none'}">
+        <video class="video-preview" id="video-preview" controls ${sel.renderStatus === 'done' ? `src="/api/scripts/${sel.id}/render-download"` : ''}></video>
+        <div style="margin-top:8px;">
+          <a id="video-download-link" class="btn-download btn-sm"
+             href="${sel.renderStatus === 'done' ? `/api/scripts/${sel.id}/render-download` : '#'}"
+             download="shorts_${sel.id}.mp4">⬇ MP4 다운로드</a>
+        </div>
+      </div>
+    </div>` : '';
 
   document.getElementById('detail-pane').innerHTML = `
     <h2>${escHtml(data.title)}</h2>
-    <div class="article-meta">
-      ${data.source} &nbsp;·&nbsp;
-      <a href="${data.url}" target="_blank">원문 링크 →</a>
-    </div>
-
+    <div class="article-meta">${data.source} &nbsp;·&nbsp; <a href="${data.url}" target="_blank">원문 링크 →</a></div>
     <div class="generate-row">
       <button class="btn-primary" onclick="generateScript(${data.id}, 'shorts')">쇼츠 대본 생성</button>
       <button class="btn-warning" onclick="generateScript(${data.id}, 'longform')">롱폼 대본 생성</button>
     </div>
-
     <div id="status-area"></div>
-
     <div class="script-tabs">
-      <button class="tab-btn ${currentScriptType === 'shorts' ? 'active' : ''}" onclick="switchTab('shorts', ${data.id})">쇼츠 (60초)</button>
-      <button class="tab-btn ${currentScriptType === 'longform' ? 'active' : ''}" onclick="switchTab('longform', ${data.id})">롱폼 (8~10분)</button>
+      <button class="tab-btn ${currentScriptType === 'shorts' ? 'active' : ''}" onclick="switchTab('shorts', ${data.id})">
+        쇼츠 (60초)${shortsAll.length > 0 ? `<span class="tab-cnt">${shortsAll.length}</span>` : ''}
+      </button>
+      <button class="tab-btn ${currentScriptType === 'longform' ? 'active' : ''}" onclick="switchTab('longform', ${data.id})">
+        롱폼 (8~10분)${longformAll.length > 0 ? `<span class="tab-cnt">${longformAll.length}</span>` : ''}
+      </button>
     </div>
-
+    ${versionBarHtml}
+    ${scriptHeaderHtml}
     <div class="script-box" id="script-content">
-      ${current ? escHtml(current.content) : '<span style="color:#4a5568">아직 대본이 없습니다. 위 버튼으로 생성하세요.</span>'}
+      ${sel ? escHtml(sel.content) : '<span style="color:#4a5568">아직 대본이 없습니다. 위 버튼으로 생성하세요.</span>'}
     </div>
-  `;
+    ${extrasHtml}`;
+
+  // Restore cached extras if same script
+  if (sel && sel.id === extrasScriptId) {
+    if (cachedTitles.length)   _renderTitleList(sel.id, sel.title);
+    if (cachedBlogContent)     _renderBlogArea(data.title);
+    if (cachedCardNews)        _renderCardNewsArea(data.title);
+  }
+
+  // Initialize render section
+  if (sel) initRenderSection(sel.id, sel.renderStatus);
+}
+
+function selectVersion(idx, articleId) {
+  currentVersionIdx = idx;
+  renderDetail(currentArticleData);
 }
 
 async function switchTab(type, id) {
   currentScriptType = type;
+  currentVersionIdx = 0;
+  clearExtrasCache();
+  _stopRenderPoll();
   const data = await fetchJSON(`/api/articles/${id}`);
   renderDetail(data);
 }
 
-async function generateScript(articleId, type) {
-  const statusArea = document.getElementById('status-area');
-  if (statusArea) statusArea.innerHTML = `<div class="status-msg status-info">생성 중... (수 초 소요)</div>`;
+function downloadCurrentScript() {
+  if (!currentArticleData) return;
+  const scripts = (currentArticleData.scripts || [])
+    .filter(s => s.type === currentScriptType).sort((a,b) => b.id - a.id);
+  const script = scripts[currentVersionIdx];
+  if (!script) return;
+  triggerDownload(script.content, `${currentArticleData.title}_${currentScriptType}`);
+}
 
+// ── Script generation ──────────────────────────────────────────────────────
+async function generateScript(articleId, type) {
+  const sa = document.getElementById('status-area');
+  if (sa) sa.innerHTML = `<div class="status-msg status-info">생성 중... (수 초 소요)</div>`;
   try {
     await fetchJSON('/api/scripts/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ article_id: articleId, type }),
     });
     currentScriptType = type;
+    currentVersionIdx = 0;
+    clearExtrasCache();
     const data = await fetchJSON(`/api/articles/${articleId}`);
     renderDetail(data);
     loadStats();
@@ -390,6 +531,311 @@ async function generateScript(articleId, type) {
   }
 }
 
+// ── Extra actions ──────────────────────────────────────────────────────────
+async function genTitles(scriptId) {
+  const area = document.getElementById('titles-area');
+  if (!area) return;
+  area.innerHTML = `<div class="loading-text">⏳ 제목 후보 생성 중...</div>`;
+  try {
+    const { titles } = await fetchJSON(`/api/scripts/${scriptId}/titles`, { method: 'POST' });
+    cachedTitles    = titles;
+    extrasScriptId  = scriptId;
+    const sel = _currentSel();
+    _renderTitleList(scriptId, sel?.title);
+  } catch (err) {
+    if (document.getElementById('titles-area'))
+      document.getElementById('titles-area').innerHTML = `<div class="status-msg status-err">오류: ${escHtml(err.message)}</div>`;
+  }
+}
+
+function _renderTitleList(scriptId, currentTitle) {
+  const area = document.getElementById('titles-area');
+  if (!area || !cachedTitles.length) return;
+  area.innerHTML = `
+    <div class="title-candidates-wrap">
+      <div class="extra-sub-label">🏷 제목 후보 (클릭하면 확정)</div>
+      ${cachedTitles.map((t, i) => `
+        <div class="title-item ${t === currentTitle ? 'selected' : ''}"
+             onclick="selectTitle(this, ${scriptId}, ${JSON.stringify(t)})">
+          ${i+1}. ${escHtml(t)}
+        </div>`).join('')}
+    </div>`;
+}
+
+async function selectTitle(el, scriptId, title) {
+  document.querySelectorAll('.title-item').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  await fetchJSON(`/api/scripts/${scriptId}`, {
+    method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title }),
+  });
+  // Update confirmed title bar
+  const bar  = document.getElementById('confirmed-title-bar');
+  const text = document.getElementById('confirmed-title-text');
+  if (bar && text) { bar.style.display = ''; text.textContent = title; }
+  // Update local cache
+  if (currentArticleData) {
+    const s = currentArticleData.scripts.find(s => s.id === scriptId);
+    if (s) s.title = title;
+  }
+}
+
+async function genBlog(scriptId) {
+  const area = document.getElementById('blog-area');
+  if (!area) return;
+  area.innerHTML = `<div class="loading-text">⏳ 블로그 글 생성 중...</div>`;
+  try {
+    const { content } = await fetchJSON(`/api/scripts/${scriptId}/blog`, { method: 'POST' });
+    cachedBlogContent = content;
+    extrasScriptId    = scriptId;
+    _renderBlogArea(currentArticleData?.title || 'article');
+  } catch (err) {
+    if (document.getElementById('blog-area'))
+      document.getElementById('blog-area').innerHTML = `<div class="status-msg status-err">오류: ${escHtml(err.message)}</div>`;
+  }
+}
+
+function _renderBlogArea(articleTitle) {
+  const area = document.getElementById('blog-area');
+  if (!area || !cachedBlogContent) return;
+  area.innerHTML = `
+    <div class="extra-content-area">
+      <div class="extra-content-header">
+        <span class="extra-sub-label">📝 블로그 글</span>
+        <button class="btn-download btn-sm" onclick="triggerDownload(cachedBlogContent, ${JSON.stringify((articleTitle||'blog')+'_블로그')})">⬇ .txt</button>
+      </div>
+      <div class="extra-content-box">${escHtml(cachedBlogContent)}</div>
+    </div>`;
+}
+
+async function genCardNews(scriptId) {
+  const area = document.getElementById('cardnews-area');
+  if (!area) return;
+  area.innerHTML = `<div class="loading-text">⏳ 카드뉴스 생성 중...</div>`;
+  try {
+    const { content } = await fetchJSON(`/api/scripts/${scriptId}/cardnews`, { method: 'POST' });
+    cachedCardNews = content;
+    extrasScriptId = scriptId;
+    _renderCardNewsArea(currentArticleData?.title || 'article');
+  } catch (err) {
+    if (document.getElementById('cardnews-area'))
+      document.getElementById('cardnews-area').innerHTML = `<div class="status-msg status-err">오류: ${escHtml(err.message)}</div>`;
+  }
+}
+
+function _renderCardNewsArea(articleTitle) {
+  const area = document.getElementById('cardnews-area');
+  if (!area || !cachedCardNews) return;
+  area.innerHTML = `
+    <div class="extra-content-area">
+      <div class="extra-content-header">
+        <span class="extra-sub-label">🃏 카드뉴스 텍스트</span>
+        <button class="btn-download btn-sm" onclick="triggerDownload(cachedCardNews, ${JSON.stringify((articleTitle||'cardnews')+'_카드뉴스')})">⬇ .txt</button>
+      </div>
+      <div class="extra-content-box">${escHtml(cachedCardNews)}</div>
+    </div>`;
+}
+
+// ── Publish / commentary ───────────────────────────────────────────────────
+function updatePublishBtn() {
+  const btn  = document.getElementById('publish-btn');
+  const text = document.getElementById('commentary-input')?.value || '';
+  if (btn) btn.disabled = !text.trim();
+}
+
+async function onPresetChange(scriptId) {
+  const preset = document.getElementById('preset-select')?.value;
+  if (!preset) return;
+  await fetchJSON(`/api/scripts/${scriptId}`, {
+    method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ editingPreset: preset }),
+  }).catch(() => {});
+}
+
+async function publishScript(scriptId) {
+  const commentary = document.getElementById('commentary-input')?.value || '';
+  const preset     = document.getElementById('preset-select')?.value || 'A';
+  if (!commentary.trim()) return;
+
+  const btn = document.getElementById('publish-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '저장 중...'; }
+
+  try {
+    const result = await fetchJSON(`/api/scripts/${scriptId}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ myCommentary: commentary, editingPreset: preset }),
+    });
+    // Update status pill without full re-render
+    const pill = document.getElementById('script-status-pill');
+    if (pill) {
+      const ready = result.status === 'ready';
+      pill.textContent = ready ? '✅ 발행 준비 완료' : '📝 초안';
+      pill.className   = `status-pill ${ready ? 'status-ready' : 'status-draft'}`;
+    }
+    if (btn) { btn.disabled = false; btn.textContent = '✅ 발행 가능으로 표시'; }
+    // Update local cache
+    if (currentArticleData) {
+      const s = currentArticleData.scripts.find(s => s.id === scriptId);
+      if (s) Object.assign(s, { myCommentary: commentary, editingPreset: preset, status: result.status });
+    }
+  } catch (err) {
+    alert('저장 실패: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = '✅ 발행 가능으로 표시'; }
+  }
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function _currentSel() {
+  if (!currentArticleData) return null;
+  const scripts = (currentArticleData.scripts || [])
+    .filter(s => s.type === currentScriptType).sort((a,b) => b.id - a.id);
+  return scripts[currentVersionIdx] || null;
+}
+
+function clearExtrasCache(newScriptId = null) {
+  extrasScriptId    = newScriptId;
+  cachedTitles      = [];
+  cachedBlogContent = '';
+  cachedCardNews    = '';
+}
+
+// ── Voices & Render ────────────────────────────────────────────────────────
+async function loadVoices() {
+  try {
+    const { voices } = await fetchJSON('/api/voices');
+    voicesList = voices || [];
+  } catch {}
+}
+
+function initRenderSection(scriptId, renderStatus) {
+  const vsel = document.getElementById('voice-select');
+  if (vsel && voicesList.length) {
+    vsel.innerHTML = voicesList.map(v =>
+      `<option value="${v.id}">${escHtml(v.name)}</option>`
+    ).join('');
+  }
+  if (renderStatus === 'rendering') _startRenderPoll(scriptId);
+}
+
+function _getSelectedVoice() {
+  return document.getElementById('voice-select')?.value || 'Kore';
+}
+
+async function genNarration(scriptId) {
+  const voiceId  = _getSelectedVoice();
+  const btn      = document.getElementById('narration-btn');
+  const msgEl    = document.getElementById('render-status-msg');
+  const progWrap = document.getElementById('render-progress-wrap');
+
+  if (btn) { btn.disabled = true; btn.textContent = '🎙 생성 중...'; }
+  if (progWrap) progWrap.style.display = '';
+  if (msgEl) msgEl.textContent = '나레이션 생성 중...';
+
+  try {
+    const result = await fetchJSON(`/api/scripts/${scriptId}/narration`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ voiceId }),
+    });
+    const dur = result.duration?.toFixed(1) ?? '?';
+    if (msgEl) msgEl.textContent = `나레이션 완료 (${dur}초)${result.silent ? ' — 무음 모드' : ''}`;
+    const renderBtn = document.getElementById('render-btn');
+    if (renderBtn) renderBtn.disabled = false;
+    // Update local cache so render button stays enabled after re-render
+    const sel = _currentSel();
+    if (sel && sel.id === scriptId) sel.narrationPath = result.audioPath;
+  } catch (err) {
+    if (msgEl) msgEl.textContent = `나레이션 오류: ${err.message}`;
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '🎙 나레이션 생성'; }
+  }
+}
+
+async function startRender(scriptId) {
+  const voiceId  = _getSelectedVoice();
+  const btn      = document.getElementById('render-btn');
+  const narrBtn  = document.getElementById('narration-btn');
+  const progWrap = document.getElementById('render-progress-wrap');
+  const fill     = document.getElementById('render-progress-fill');
+  const msgEl    = document.getElementById('render-status-msg');
+  const vidWrap  = document.getElementById('video-preview-wrap');
+
+  if (btn) btn.disabled = true;
+  if (narrBtn) narrBtn.disabled = true;
+  if (progWrap) progWrap.style.display = '';
+  if (fill) fill.style.width = '0%';
+  if (msgEl) msgEl.textContent = '렌더링 시작 중...';
+  if (vidWrap) vidWrap.style.display = 'none';
+
+  try {
+    await fetchJSON(`/api/scripts/${scriptId}/render`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ voiceId }),
+    });
+    _startRenderPoll(scriptId);
+  } catch (err) {
+    if (msgEl) msgEl.textContent = `렌더 오류: ${err.message}`;
+    if (btn) btn.disabled = false;
+    if (narrBtn) narrBtn.disabled = false;
+  }
+}
+
+function _startRenderPoll(scriptId) {
+  _stopRenderPoll();
+  renderPollTimer = setInterval(async () => {
+    try {
+      const job = await fetchJSON(`/api/scripts/${scriptId}/render-status`);
+      _updateRenderProgress(job);
+      if (job.status === 'done') {
+        _stopRenderPoll();
+        _showVideoPreview(scriptId);
+        const btn = document.getElementById('render-btn');
+        const narrBtn = document.getElementById('narration-btn');
+        if (btn) { btn.disabled = false; btn.textContent = '🎬 다시 렌더링'; }
+        if (narrBtn) narrBtn.disabled = false;
+      } else if (job.status === 'error') {
+        _stopRenderPoll();
+        const btn = document.getElementById('render-btn');
+        const narrBtn = document.getElementById('narration-btn');
+        if (btn) btn.disabled = false;
+        if (narrBtn) narrBtn.disabled = false;
+      }
+    } catch {}
+  }, 2000);
+}
+
+function _stopRenderPoll() {
+  if (renderPollTimer) { clearInterval(renderPollTimer); renderPollTimer = null; }
+}
+
+function _updateRenderProgress(job) {
+  const fill  = document.getElementById('render-progress-fill');
+  const msgEl = document.getElementById('render-status-msg');
+  const wrap  = document.getElementById('render-progress-wrap');
+  if (wrap) wrap.style.display = '';
+  if (fill) fill.style.width = (job.progress || 0) + '%';
+  if (msgEl) {
+    if (job.status === 'error') {
+      msgEl.textContent = `오류: ${job.message || job.error || '알 수 없는 오류'}`;
+      msgEl.style.color = '#fc8181';
+    } else {
+      msgEl.textContent = `${job.progress || 0}% — ${job.message || ''}`;
+      msgEl.style.color = '';
+    }
+  }
+}
+
+function _showVideoPreview(scriptId) {
+  const wrap   = document.getElementById('video-preview-wrap');
+  const video  = document.getElementById('video-preview');
+  const dlLink = document.getElementById('video-download-link');
+  if (!wrap || !video) return;
+  const src = `/api/scripts/${scriptId}/render-download`;
+  video.src = src;
+  if (dlLink) { dlLink.href = src; dlLink.download = `shorts_${scriptId}.mp4`; }
+  wrap.style.display = '';
+}
+
+// ── Scrape / generate-all ──────────────────────────────────────────────────
 async function triggerScrape() {
   await fetchJSON('/api/scrape', { method: 'POST' });
   alert('수집을 시작했습니다. 잠시 후 새로고침 버튼을 눌러주세요.');
@@ -402,14 +848,46 @@ async function triggerGenerateAll() {
   setTimeout(() => { loadArticles(); loadStats(); }, 15000);
 }
 
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// ── Scripts modal ──────────────────────────────────────────────────────────
+async function openScriptsModal() {
+  const modal = document.getElementById('scripts-modal');
+  const body  = document.getElementById('modal-body');
+  modal.style.display = 'flex';
+  body.innerHTML = '<div class="empty-state">로딩 중...</div>';
+  try {
+    const data = await fetchJSON('/api/scripts?limit=200');
+    modalScriptsData = data.scripts || [];
+    if (!modalScriptsData.length) { body.innerHTML = '<div class="empty-state">생성된 대본이 없습니다.</div>'; return; }
+    body.innerHTML = modalScriptsData.map((s, idx) => `
+      <div class="modal-script-row">
+        <div class="modal-script-info">
+          <div class="modal-script-title">${escHtml(s.article_title || '(제목 없음)')}</div>
+          <div class="modal-script-meta">
+            <span class="type-tag ${s.type === 'shorts' ? 'type-tag-shorts' : 'type-tag-longform'}">${s.type === 'shorts' ? '쇼츠' : '롱폼'}</span>
+            ${s.created_at ? s.created_at.slice(0, 16) : ''} &nbsp;·&nbsp; ${escHtml(s.source || '')}
+            ${s.status === 'ready' ? '&nbsp;<span class="status-pill status-ready" style="font-size:0.62rem">발행 준비</span>' : ''}
+          </div>
+        </div>
+        <button class="btn-download btn-sm" data-idx="${idx}" onclick="downloadFromModal(this)">⬇ .txt</button>
+      </div>`).join('');
+  } catch (err) {
+    body.innerHTML = `<div class="empty-state" style="color:#fc8181;">오류: ${escHtml(err.message)}</div>`;
+  }
 }
 
-// Init
+function downloadFromModal(btn) {
+  const s = modalScriptsData[parseInt(btn.dataset.idx, 10)];
+  if (s) triggerDownload(s.content, `${s.article_title || 'script'}_${s.type}`);
+}
+
+function closeModal() { document.getElementById('scripts-modal').style.display = 'none'; }
+function onModalOverlayClick(e) { if (e.target === document.getElementById('scripts-modal')) closeModal(); }
+
+// ── Init ───────────────────────────────────────────────────────────────────
 loadStats();
 loadArticles();
-setInterval(() => { loadStats(); }, 60000);
+loadVoices();
+setInterval(loadStats, 60000);
 </script>
 </body>
 </html>

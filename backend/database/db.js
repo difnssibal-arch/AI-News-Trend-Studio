@@ -72,10 +72,35 @@ db.exec(`
     FOREIGN KEY (article_id) REFERENCES articles(id)
   );
 
+  CREATE TABLE IF NOT EXISTS api_usage (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    script_id     INTEGER REFERENCES scripts(id),
+    model         TEXT,
+    input_tokens  INTEGER DEFAULT 0,
+    output_tokens INTEGER DEFAULT 0,
+    created_at    DATETIME DEFAULT (datetime('now', 'localtime'))
+  );
+
   CREATE INDEX IF NOT EXISTS idx_articles_created_at   ON articles(created_at);
   CREATE INDEX IF NOT EXISTS idx_articles_is_processed ON articles(is_processed);
   CREATE INDEX IF NOT EXISTS idx_scripts_article_id    ON scripts(article_id);
+  CREATE INDEX IF NOT EXISTS idx_usage_script_id       ON api_usage(script_id);
 `);
+
+// Migrate: add columns to scripts and articles if they don't exist yet
+for (const sql of [
+  "ALTER TABLE scripts ADD COLUMN myCommentary TEXT DEFAULT ''",
+  "ALTER TABLE scripts ADD COLUMN editingPreset TEXT DEFAULT 'A'",
+  "ALTER TABLE scripts ADD COLUMN status TEXT DEFAULT 'draft'",
+  "ALTER TABLE scripts ADD COLUMN narrationPath TEXT",
+  "ALTER TABLE scripts ADD COLUMN renderStatus TEXT DEFAULT 'idle'",
+  "ALTER TABLE scripts ADD COLUMN renderPath TEXT",
+  "ALTER TABLE scripts ADD COLUMN renderProgress INTEGER DEFAULT 0",
+  "ALTER TABLE articles ADD COLUMN imageUrls TEXT DEFAULT '[]'",
+  "ALTER TABLE articles ADD COLUMN imageNeeded INTEGER DEFAULT 0",
+]) {
+  try { db.exec(sql); } catch (_) {}
+}
 
 console.log('[db] 초기화 완료 →', DB_PATH);
 

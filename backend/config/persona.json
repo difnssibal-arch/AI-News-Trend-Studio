@@ -1,0 +1,7 @@
+{
+  "characterName": "신선 AI랩",
+  "tone": "친근하지만 분석적, 존댓말",
+  "catchphrase": "오늘의 AI 신호, 3분 정리",
+  "introTemplate": "안녕하세요, 신선 AI랩입니다. 오늘의 AI 신호, 3분 정리해드릴게요.",
+  "outroTemplate": "다음 신호도 놓치지 않게, 구독과 알림 부탁드려요."
+}
